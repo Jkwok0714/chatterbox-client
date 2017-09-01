@@ -1,9 +1,10 @@
 // YOUR CODE HERE:
 var app = {};
+app.server = 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages';
 app.send = (message) => {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
-    url: 'http://parse.sfm8.hackreactor.com/',
+    url: app.server,
     type: 'POST',
     data: JSON.stringify(message),
     contentType: 'application/json',
@@ -18,8 +19,14 @@ app.send = (message) => {
 };
 
 app.fetch = () => {
-  $.ajax({
-    type: 'GET',
+  // $.ajax({
+  //   url: 'http://parse.sfm8.hackreactor.com/',
+  //   type: 'GET',
+  //   success: function (data) {
+  //   }
+  // });
+  $.get(app.server, (data) => {
+    console.log(data);
   });
 };
 
@@ -45,13 +52,13 @@ app.handleUsernameClick = () => {
 };
 
 app.handleSubmit = () => {
-  // var message = {
-  //   username: 'Mel Brooks',
-  //   text: 'It\'s good to be the king',
-  //   roomname: 'lobby'
-  // };
-  // app.send(message);
-  // console.log('submit');
+  var message = {
+    username: 'Mel Brooks',
+    text: 'It\'s good to be the king',
+    roomname: 'lobby'
+  };
+  app.send(message);
+  console.log('submit');
   return true;
 };
 
@@ -67,4 +74,5 @@ app.init = () => {
   });
 
   $('#send .submit').val('BOOM');
+
 };
