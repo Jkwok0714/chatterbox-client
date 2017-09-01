@@ -19,15 +19,16 @@ app.send = (message) => {
 };
 
 app.fetch = () => {
-  // $.ajax({
-  //   url: 'http://parse.sfm8.hackreactor.com/',
-  //   type: 'GET',
-  //   success: function (data) {
-  //   }
-  // });
+  var chatHistory = [];
   $.get(app.server, (data) => {
-    console.log(data);
+    var messageArray = data.results;
+    for (var message of messageArray) {
+      app.renderMessage(message);
+    }
+
   });
+  // console.log(chatHistory);
+  return chatHistory;
 };
 
 app.clearMessages = () => {
@@ -36,9 +37,16 @@ app.clearMessages = () => {
 
 app.renderMessage = (message) => {
   var $body = $('#chats');
-  var $textBit = $(`<div class="message"><button class="username">${message.username}</button>
-    <br>${message.text}</div>`);
+  //var $textBit = $(`<div class="message"><button class="username">${message.username}</button>
+  //  <br>${message.text}</div>`);
+  var $textBit = $('<div />');
+  var $innerButton = $('<button />');
+  $innerButton.addClass('username');
+  $innerButton.text(message.username);
+  $textBit.addClass('message');
+  $textBit.text(message.text);
   $textBit.appendTo($body);
+  $innerButton.prependTo($textBit);
 };
 
 app.renderRoom = (room) => {
@@ -52,19 +60,23 @@ app.handleUsernameClick = () => {
 };
 
 app.handleSubmit = () => {
-  var message = {
-    username: 'Mel Brooks',
-    text: 'It\'s good to be the king',
-    roomname: 'lobby'
-  };
-  app.send(message);
-  console.log('submit');
+  // var message = {
+  //   username: 'Mel Brooks',
+  //   text: 'It\'s good to be the king',
+  //   roomname: 'lobby'
+  // };
+  // app.send(message);
+  // console.log('submit');
   return true;
 };
 
 
 
 app.init = () => {
+  var chatHistory = app.fetch();
+  // console.log(chatHistory);
+  //app.renderMessage(message);
+
   $('#chats').on('click', '.username', () => {
     app.handleUsernameClick();
   });
@@ -76,3 +88,7 @@ app.init = () => {
   $('#send .submit').val('BOOM');
 
 };
+
+$(document).ready(() => {
+  app.init();
+});
