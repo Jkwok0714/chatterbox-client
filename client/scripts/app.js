@@ -46,6 +46,12 @@ app.fetch = () => {
       console.log(data);
       var messageArray = data.results;
       for (var message of messageArray) {
+        if (message.roomname === null || message.roomname === undefined) {
+          message.roomname = 'lobby';
+        } else {
+          message.roomname = message.roomname.replace(/\s+/g, '');
+          message.roomname = message.roomname.replace('\'', '');
+        }
         if (!app.alreadyPushed.includes(message.objectId)) {
           console.log(message.username, 'is in', message.roomname);
           app.renderMessage(message);
@@ -79,9 +85,9 @@ app.renderMessage = (message) => {
   $textBit.addClass('message');
   $textBit.text(JSON.stringify(message.text));
   $textBit.prependTo($body);
-  $textBit.addClass(message.roomname);
+  $textBit.addClass(message.roomname.replace(/\s+/g, ''));
   $innerButton.prependTo($textBit);
-  if (message.roomname !== app.selectRoom) {
+  if (message.roomname.replace(/\s+/g, '') !== app.selectRoom && app.selectRoom !== 'lobby') {
     $textBit.hide();
   }
 };
@@ -93,14 +99,15 @@ app.renderRoom = (room) => {
 };
 
 app.addRoom = (room) => {
+  if (room === null) {
+    return;
+  }
+  // room = JSON.stringify(room);
   app.currentRooms.push(room);
   app.renderRoom(room);
   app.hideOtherRooms(room);
 };
 
-app.handleUsernameClick = () => {
-  return true;
-};
 
 app.handleSubmit = () => {
 
@@ -119,9 +126,18 @@ app.buildMessageObject = function () {
 };
 
 app.hideOtherRooms = function(room) {
+  // room = JSON.stringify(room);
   $('.message').not('.' + room).hide();
   $('.' + room).show();
-}
+  if (room === 'lobby') {
+    $('.null').show();
+  }
+};
+
+app.handleUsernameClick = (user) => {
+  console.log(user);
+  return true;
+};
 
 app.init = () => {
   var chatHistory = app.fetch();
@@ -132,8 +148,9 @@ app.init = () => {
   //app.renderMessage(message);
 
   $('#chats').on('click', '.username', () => {
-    app.handleUsernameClick();
+    app.handleUsernameClick($('this').val());
   });
+
   $('#send').off().submit('click', function (e) {
     // e.stopPropagation();
     if ($('#roomSelect').val() === 'newRoom') {
@@ -152,12 +169,13 @@ app.init = () => {
     app.hideOtherRooms($('#roomSelect').val());
   });
 
+
 };
 
 $(document).ready(() => {
   app.init();
-  $(`#roomSelect option[value=lobby]`).prop('selected', 'selected');
-  var timer = setInterval(app.fetch ,10000);
+  $('#roomSelect option[value=lobby]').prop('selected', 'selected');
+  var timer = setInterval(app.fetch, 10000);
 
   console.log(window.location.search);
   console.log($('#roomSelect').val());
