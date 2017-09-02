@@ -32,7 +32,7 @@ app.fetch = () => {
   //   }
   // });
   // app.clearMessages();
-  var d = new Date( (new Date()).getTime() - 1000 * 6000);
+  var d = new Date( (new Date()).getTime() - 1000 * 600);
   var dateISO = d.toISOString();
 
   // console.log(dateISO);
@@ -43,7 +43,7 @@ app.fetch = () => {
     // beforeSend: app.setHeader,
     data: `where={"createdAt":{"$gte":{"__type":"Date","iso":"${dateISO}"}}}`,
     success: function(data) {
-      console.log(data);
+      console.log('current messages:', data.results.length);
       var messageArray = data.results;
       for (var message of messageArray) {
         if (message.roomname === null || message.roomname === undefined) {
@@ -52,8 +52,11 @@ app.fetch = () => {
           message.roomname = message.roomname.replace(/\s+/g, '');
           message.roomname = message.roomname.replace('\'', '');
         }
+        if(message.username === null || message.username === undefined) {
+          message.username = 'anon';
+        }
         if (!app.alreadyPushed.includes(message.objectId)) {
-          console.log(message.username, 'is in', message.roomname);
+          // console.log(message.username, 'is in', message.roomname);
           app.renderMessage(message);
           app.alreadyPushed.push(message.objectId);
           if (!app.currentRooms.includes(message.roomname)) {
@@ -81,9 +84,13 @@ app.renderMessage = (message) => {
   var $textBit = $('<div />');
   var $innerButton = $('<button />');
   $innerButton.addClass('username');
-  $innerButton.text(JSON.stringify(message.username));
+  $innerButton.text(message.username);
   $textBit.addClass('message');
+  $textBit.addClass(message.username.replace(/\s+/g, '-'));
   $textBit.text(JSON.stringify(message.text));
+  if (app.friends.indexOf(message.username.replace(/\s+/g, '-')) !== -1) {
+    $textBit.addClass('friend');
+  }
   $textBit.prependTo($body);
   $textBit.addClass(message.roomname.replace(/\s+/g, ''));
   $innerButton.prependTo($textBit);
@@ -135,20 +142,24 @@ app.hideOtherRooms = function(room) {
 };
 
 app.handleUsernameClick = (user) => {
-  console.log(user);
-  return true;
+  // console.log('looking for', user);
+  var friendName = user.replace(/\s+/g, '-');
+  app.friends.push(friendName);
+  $(`.${friendName}`).addClass('friend');
 };
 
 app.init = () => {
   var chatHistory = app.fetch();
   app.alreadyPushed = [];
   app.currentRooms = [];
+  app.friends = [];
   app.selectRoom = 'lobby';
   // console.log(chatHistory);
   //app.renderMessage(message);
 
-  $('#chats').on('click', '.username', () => {
-    app.handleUsernameClick($('this').val());
+  $('#chats').on('click', '.username', function () {
+    // console.log($(this).text());
+    app.handleUsernameClick($(this).text());
   });
 
   $('#send').off().submit('click', function (e) {
