@@ -47,7 +47,7 @@ app.fetch = () => {
       var messageArray = data.results;
       for (var message of messageArray) {
         if (!app.alreadyPushed.includes(message.objectId)) {
-           console.log(message.username, 'is in', message.roomname);
+          console.log(message.username, 'is in', message.roomname);
           app.renderMessage(message);
           app.alreadyPushed.push(message.objectId);
           if (!app.currentRooms.includes(message.roomname)) {
@@ -75,14 +75,15 @@ app.renderMessage = (message) => {
   var $textBit = $('<div />');
   var $innerButton = $('<button />');
   $innerButton.addClass('username');
-  $innerButton.text(message.username);
+  $innerButton.text(JSON.stringify(message.username));
   $textBit.addClass('message');
-  $textBit.hide();
-  $textBit.text(message.text);
+  $textBit.text(JSON.stringify(message.text));
   $textBit.prependTo($body);
   $textBit.addClass(message.roomname);
   $innerButton.prependTo($textBit);
-  $textBit.show();
+  if (message.roomname !== app.selectRoom) {
+    $textBit.hide();
+  }
 };
 
 app.renderRoom = (room) => {
@@ -94,6 +95,7 @@ app.renderRoom = (room) => {
 app.addRoom = (room) => {
   app.currentRooms.push(room);
   app.renderRoom(room);
+  app.hideOtherRooms(room);
 };
 
 app.handleUsernameClick = () => {
@@ -109,17 +111,23 @@ app.buildMessageObject = function () {
   var message = {
     username: (window.location.search).split('=')[1],
     text: $('#message').val(),
-    roomname: 'lobby'
+    roomname: $('#roomSelect').val()
   };
   $('#message').val('');
-  app.renderMessage(message);
+  app.fetch();
   return message;
 };
+
+app.hideOtherRooms = function(room) {
+  $('.message').not('.' + room).hide();
+  $('.' + room).show();
+}
 
 app.init = () => {
   var chatHistory = app.fetch();
   app.alreadyPushed = [];
   app.currentRooms = [];
+  app.selectRoom = 'lobby';
   // console.log(chatHistory);
   //app.renderMessage(message);
 
@@ -128,14 +136,27 @@ app.init = () => {
   });
   $('#send').off().submit('click', function (e) {
     // e.stopPropagation();
-    app.handleSubmit();
-    e.preventDefault();
+    if ($('#roomSelect').val() === 'newRoom') {
+      var newRoomName = $('#message').val();
+      app.addRoom(newRoomName);
+      $(`#roomSelect option[value=${newRoomName}]`).prop('selected', 'selected');
+      $('#message').val('');
+    } else {
+      app.handleSubmit();
+      e.preventDefault();
+    }
+  });
+
+  $('#roomSelect').change(() => {
+    app.selectRoom = $('#roomSelect').val();
+    app.hideOtherRooms($('#roomSelect').val());
   });
 
 };
 
 $(document).ready(() => {
   app.init();
+  $(`#roomSelect option[value=lobby]`).prop('selected', 'selected');
   var timer = setInterval(app.fetch ,10000);
 
   console.log(window.location.search);
