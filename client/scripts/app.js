@@ -31,11 +31,11 @@ app.fetch = () => {
   //     app.renderMessage(message);
   //   }
   // });
-  app.clearMessages();
+  // app.clearMessages();
   var d = new Date( (new Date()).getTime() - 1000 * 6000);
   var dateISO = d.toISOString();
 
-  console.log(dateISO);
+  // console.log(dateISO);
 
   $.ajax({
     url: app.server,
@@ -44,12 +44,20 @@ app.fetch = () => {
     data: `where={"createdAt":{"$gte":{"__type":"Date","iso":"${dateISO}"}}}`,
     success: function(data) {
       console.log(data);
-        var messageArray = data.results;
-        for (var message of messageArray) {
+      var messageArray = data.results;
+      for (var message of messageArray) {
+        if (!app.alreadyPushed.includes(message.objectId)) {
+           console.log(message.username, 'is in', message.roomname);
           app.renderMessage(message);
+          app.alreadyPushed.push(message.objectId);
+          if (!app.currentRooms.includes(message.roomname)) {
+            app.addRoom(message.roomname);
+          }
         }
+      }
     }
   });
+  window.preventDefault;
 };
 
 // app.setHeader = function(xhr) {
@@ -83,6 +91,11 @@ app.renderRoom = (room) => {
   $bit.appendTo($target);
 };
 
+app.addRoom = (room) => {
+  app.currentRooms.push(room);
+  app.renderRoom(room);
+};
+
 app.handleUsernameClick = () => {
   return true;
 };
@@ -101,10 +114,12 @@ app.buildMessageObject = function () {
   $('#message').val('');
   app.renderMessage(message);
   return message;
-}
+};
 
 app.init = () => {
   var chatHistory = app.fetch();
+  app.alreadyPushed = [];
+  app.currentRooms = [];
   // console.log(chatHistory);
   //app.renderMessage(message);
 
@@ -121,7 +136,7 @@ app.init = () => {
 
 $(document).ready(() => {
   app.init();
-  var timer = setInterval(app.fetch ,10000)
+  var timer = setInterval(app.fetch ,10000);
 
   console.log(window.location.search);
   console.log($('#roomSelect').val());
