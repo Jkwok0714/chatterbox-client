@@ -1,5 +1,5 @@
 body {
-    background: #eee;
+    background: #35373a;
     text-align: center;
     padding: 0 25px;
     font-family: arial, sans-serif;
@@ -21,7 +21,14 @@ button {
   padding: 2px 2px 2px 2px;
   text-decoration: none;
 }
-
+.submit {
+  background: url("https://mir-s3-cdn-cf.behance.net/project_modules/disp/d116b220169051.562e6b346f99c.gif");
+  background-size: 60%;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 50%;
+  height: 15%;
+}
 button:hover {
   background: #3cb0fd;
   background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
@@ -45,8 +52,9 @@ button:hover {
 #main {
   background-image: url("http://arturmeyster.com/content/images/2014/12/Hack-Reactor-Interview-Process-1.jpeg");
   background-size: 35%;
+
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: 50% 20%;
 }
 
 #main h1 {
@@ -80,7 +88,7 @@ button:hover {
     line-height: 13px;
 }
 #spacer {
-  height: 213px;
+  height: 123px;
 }
 form {
     padding: 20px;
@@ -97,22 +105,25 @@ form input[type=text] {
     padding: 5px;
 }
 input[type=submit]{
-  margin-left: 50%;
+  color: white;
+  margin-left: 25%;
+  height: 12em;
+  border: 0px;
 }
 
 #chats {
     padding: 5px;
     width: 80%;
-    background-color: gray;
+    background-color: #35373a;
     margin-bottom: 5px;
-    background-color: #eee;
+    border: 0px;
 }
 
-.chat .username {
+#chat .username {
     font-weight: 800;
 }
 
-.chat:hover {
+#chat:hover {
     background-color: #ddd;
 }
 
@@ -125,14 +136,14 @@ input[type=submit]{
 .spinner img {
     padding: 10px;
 }
-
-.friend {
-    color: #fff;
-    background-color: #0090da;
-}
 .message {
   width: 100%;
   margin-bottom: 5px;
-  background-color: lightblue;
+  background-color: #35373a;
   color: yellow;
+}
+.friend {
+    color: #fff;
+    font-weight: bolder;
+    background-color: #0090da;
 }

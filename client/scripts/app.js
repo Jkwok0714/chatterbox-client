@@ -46,7 +46,7 @@ app.fetch = () => {
       console.log('current messages:', data.results.length);
       var messageArray = data.results;
       for (var message of messageArray) {
-        if (message.roomname === null || message.roomname === undefined) {
+        if (message.roomname === null || message.roomname === undefined || message.roomname === 'Lobby') {
           message.roomname = 'lobby';
         } else {
           message.roomname = message.roomname.replace(/\s+/g, '');
@@ -100,12 +100,16 @@ app.renderMessage = (message) => {
 };
 
 app.renderRoom = (room) => {
+  if (room === 'lobby') {
+    return;
+  }
   var $target = $('#roomSelect');
   var $bit = $(`<option value = "${room}">${room}</option>`);
   $bit.appendTo($target);
 };
 
 app.addRoom = (room) => {
+  // console.log('Making room', room)
   if (room === null) {
     return;
   }
@@ -163,12 +167,13 @@ app.init = () => {
   });
 
   $('#send').off().submit('click', function (e) {
-    // e.stopPropagation();
+    //e.stopPropagation();
     if ($('#roomSelect').val() === 'newRoom') {
-      var newRoomName = $('#message').val();
+      var newRoomName = $('#message').val().replace(/\s+/g, '-');
       app.addRoom(newRoomName);
       $(`#roomSelect option[value=${newRoomName}]`).prop('selected', 'selected');
       $('#message').val('');
+      e.preventDefault();
     } else {
       app.handleSubmit();
       e.preventDefault();
@@ -176,8 +181,10 @@ app.init = () => {
   });
 
   $('#roomSelect').change(() => {
-    app.selectRoom = $('#roomSelect').val();
-    app.hideOtherRooms($('#roomSelect').val());
+    if ($('#roomSelect').val() !== 'newRoom') {
+      app.selectRoom = $('#roomSelect').val();
+      app.hideOtherRooms($('#roomSelect').val());
+    }
   });
 
 
@@ -186,7 +193,7 @@ app.init = () => {
 $(document).ready(() => {
   app.init();
   $('#roomSelect option[value=lobby]').prop('selected', 'selected');
-  var timer = setInterval(app.fetch, 10000);
+  var timer = setInterval(app.fetch, 5000);
 
   console.log(window.location.search);
   console.log($('#roomSelect').val());
