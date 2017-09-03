@@ -51,8 +51,7 @@ button:hover {
 
 #main {
   background-image: url("http://arturmeyster.com/content/images/2014/12/Hack-Reactor-Interview-Process-1.jpeg");
-  background-size: 35%;
-
+  background-size: auto 43%;
   background-repeat: no-repeat;
   background-position: 50% 20%;
 }
@@ -141,9 +140,14 @@ input[type=submit]{
   margin-bottom: 5px;
   background-color: #35373a;
   color: yellow;
+  hidden: block;
 }
 .friend {
     color: #fff;
     font-weight: bolder;
     background-color: #0090da;
+}
+
+.me {
+  color: #fffdef;
 }
